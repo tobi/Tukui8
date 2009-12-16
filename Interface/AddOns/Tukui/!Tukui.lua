@@ -4,7 +4,6 @@
 -- Fix UI Variables
 -- Setup Chat Frames
 -- Print the current resolution to chat
--- etc
 
 BLANK_TEXTURE			= "Interface\\AddOns\\Tukui\\media\\WHITE64X64"
 
