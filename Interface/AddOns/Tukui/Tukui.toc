@@ -1,0 +1,62 @@
+## Interface: 30300
+## Author: Tukz
+## Version: 8.04
+## Title: |cffC495DDTukui|r
+## Notes: UI of awesomeness!
+## SavedVariables: tCooldownTracker_Saved
+## X-oUF: oUF
+
+translateplz.lua
+!Tukui_config.lua
+!Tukui.lua
+!Tukui_AuraWatch.lua
+combatfont.lua
+nameplates.lua
+cargbag_core.lua
+cargbag_helpers.lua
+cargbag_handler.lua
+keys\basic.lua
+keys\tooltip.lua
+plugins\bagbar.lua
+plugins\databroker.lua
+plugins\money.lua
+plugins\purchase.lua
+plugins\space.lua
+cargbag_Config.lua
+cargbag_layout.lua
+ncError.lua
+omnicc.lua
+oUF.xml
+oUF_Smooth.lua
+oUF_AuraWatch.lua
+oUF_DebuffHighlight.lua
+oUF_Experience.lua
+oUF_MoveableFrames.lua
+oUF_Reputation.lua
+oUF_ThreatBar.lua
+oUF_Tukz_Tags.lua
+oUF_Tukz_Main.lua
+oUF_Tukz_WeakenedSoul.lua
+rActionButtonStyler.lua
+sGroupLoot.lua
+tActionBars.lua
+tAutoAcceptInvite.lua
+tAutoInvite.lua
+tAutoInvite.xml
+tAutoRepair.lua
+tAutoSellJunk.lua
+tBuffs.lua
+tChat.lua
+tCombo.lua
+tCombo.xml
+tCooldownTracker.lua
+tInnerFire.lua
+tLoot.lua
+tMark.lua
+tMinimap.lua
+tPanels.lua
+translateplz.lua
+tTell.lua
+tTell.xml
+tTooltip.lua
+arena_focus.lua
