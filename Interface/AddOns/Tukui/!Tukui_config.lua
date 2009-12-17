@@ -84,6 +84,11 @@ t_arena = true
 ArenaX = 252		-- position X (left/right) on UI
 ArenaY = 260		-- position Y (up/down) on UI
 
+-- enable a keybind as a set focus key on arena frame or unit mouseover
+focuskey = false
+arenamodifier = "shift" -- shift, alt or ctrl
+arenamouseButton = "3" -- 1 = left, 2 = right, 3 = middle, 4 and 5 = thumb buttons if there are any
+
 ----------------------------------------------------------------------------------------
 -- Panels config (you can't have more than 6 active panels)
 ----------------------------------------------------------------------------------------
