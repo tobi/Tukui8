@@ -136,11 +136,8 @@ localtime = true 				-- set local or server time
 tinfowidth = 370				-- set de width of left and right infos bars + chatframe width
 
 ----------------------------------------------------------------------------------------
--- Action bars options
+-- Tukz Action bars options
 ----------------------------------------------------------------------------------------
-
-  -- use tukz action bars ?
-  tukbars = true
 
   -- number of bars you want to show on the right side?
   rightbarnumber = 0 	-- (need to be set at : 0, 1, 2 or 3)

@@ -9,7 +9,7 @@
   -- position table for the default frame holder positions
   -- those are use if the bar is set to not movable or if there is no value in the layout-cache.txt for that frame yet
 
-if tukbars == true then
+if not (IsAddOnLoaded("Dominos") or IsAddOnLoaded("Bartender4") or IsAddOnLoaded("Macaroon") or IsAddOnLoaded("XBar")) then
   
   frame_positions = {
     [1]  =  { a = "BOTTOM",         x = -140, y = 19  },  --fbar1_button_system_1
