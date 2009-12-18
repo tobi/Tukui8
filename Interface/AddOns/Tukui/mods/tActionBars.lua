@@ -20,7 +20,7 @@ if not (IsAddOnLoaded("Dominos") or IsAddOnLoaded("Bartender4") or IsAddOnLoaded
     [6]  =  { a = "RIGHT",          x = -20,   y = 0   },  --fbar45
     [9]  =  { a = "RIGHT",         x = -120,    y = 163 },  --petbar
     [10] =  { a = "BOTTOM",         x = -231,    y = 136 },  --shapeshift
-    [11] =  { a = "BOTTOM",         x = 330,    y = 11 },  --my own vehicle exit button
+    [11] =  { a = "BOTTOM",         x = 0,    y = 133 },  --my own vehicle exit button
   }
  
   -- Frame to hold the ActionBar1 and the BonusActionBar
@@ -86,8 +86,8 @@ if not (IsAddOnLoaded("Dominos") or IsAddOnLoaded("Bartender4") or IsAddOnLoaded
   fveb:SetPoint(frame_positions[11].a,frame_positions[11].x,frame_positions[11].y) 
   
   local veb = CreateFrame("BUTTON", "rABS_VehicleExitButton", fveb, "SecureActionButtonTemplate");
-  veb:SetWidth(30)
-  veb:SetHeight(30)
+  veb:SetWidth(40)
+  veb:SetHeight(40)
   veb:SetPoint("CENTER",0,0)
   veb:RegisterForClicks("AnyUp")
   veb:SetNormalTexture("Interface\\Vehicles\\UI-Vehicles-Button-Exit-Up")

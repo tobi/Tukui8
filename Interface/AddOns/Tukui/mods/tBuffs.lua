@@ -55,7 +55,7 @@ ConsolidatedBuffsIcon:SetAlpha(0)
 ConsolidatedBuffs.SetPoint = dummy
 
 for i = 1, 2 do
-	local TempBG = BuffPanel(30, 30, -2, 2, "TOPLEFT", "TOPLEFT", _G["TempEnchant"..i], 1, _G["TempEnchant"..i], "BACKGROUND")
+	local TempBG = BuffPanel(30, 30, -2, 2, "TOPLEFT", "TOPLEFT", _G["TempEnchant"..i], 0, _G["TempEnchant"..i], "BACKGROUND")
 	
 	_G["TempEnchant"..i.."Border"]:Hide()
 	_G["TempEnchant"..i.."Icon"]:SetTexCoord(.1, .9, .1, .9)
@@ -93,7 +93,7 @@ local function StyleBuffs(buttonName, index, debuff)
 		Duration:SetPoint("BOTTOM", 0, -16)
 		Duration:SetFont("Fonts\\FRIZQT__.TTF",12)
 		
-		_G[buttonName..index.."bPanel"] = BuffPanel(30, 30, -2, 2, "TOPLEFT", "TOPLEFT", buff, 1, buff, "BACKGROUND")
+		_G[buttonName..index.."bPanel"] = BuffPanel(30, 30, -2, 2, "TOPLEFT", "TOPLEFT", buff, 0, buff, "BACKGROUND")
 
 		if debuff then
 			_G[buttonName..index.."bPanel"]:SetBackdropBorderColor(134/255, 12/255, 12/255)
