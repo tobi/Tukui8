@@ -149,6 +149,9 @@ tinfowidth = 370				-- set de width of left and right infos bars + chatframe wid
   padding = 4
   petpadding = -4 --(negative numbers because petbar it set to vertical instead of horizontal)
   stancepadding = 1
+  
+  -- hide totem bar
+  hide_totem = 0
 
   -- shapeshift
   move_shapeshift = 1

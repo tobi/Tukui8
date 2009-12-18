@@ -72,7 +72,7 @@ if not (IsAddOnLoaded("Dominos") or IsAddOnLoaded("Bartender4") or IsAddOnLoaded
   
   -- Frame to hold the shapeshift bars  
   local fshift = CreateFrame("Frame","rABS_ShapeShiftHolder",UIParent)
-  fshift:SetWidth(260) -- size the width here
+  fshift:SetWidth(50) -- size the width here
   fshift:SetHeight(50) -- size the height here
   fshift:SetPoint(frame_positions[10].a,frame_positions[10].x,frame_positions[10].y) 
   
