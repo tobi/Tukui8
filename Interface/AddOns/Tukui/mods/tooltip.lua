@@ -73,7 +73,7 @@ end
 
 local function unitName(unit)
         if not unit then return end
-        local unitName, unitRealm       = UnitName(unit) or ""
+        local unitName, unitRealm       = UnitName(unit)
         local Reaction                  = UnitReaction(unit, "player") or 5
         local Attackable                = UnitCanAttack("player", unit)
         local Dead                      = UnitIsDead(unit)
