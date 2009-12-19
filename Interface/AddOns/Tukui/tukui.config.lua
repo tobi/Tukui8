@@ -142,7 +142,7 @@ tinfowidth = 370				-- set de width of left and right infos bars + chatframe wid
   rightbarnumber = 0 	-- (need to be set at : 0, 1, 2 or 3)
   
   -- right bars and pet on mouseover ?
-  rightbars_on_mouseover = true 
+  rightbars_on_mouseover = false 
   
   -- shapeshift / totem
   if select(2, UnitClass("Player")) == "SHAMAN" then
