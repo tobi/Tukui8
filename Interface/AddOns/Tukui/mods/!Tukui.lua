@@ -113,6 +113,7 @@ local function TukuiConfig()
 	SetCVar("scriptErrors", 0)
 	SetCVar("autoSelfCast", 1)
 	SetCVar("secureAbilityToggle", 0)
+	SetCVar("showArenaEnemyFrames", 0)
 		
 	SetMultisampleFormat(1)
 
