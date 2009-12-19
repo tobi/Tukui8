@@ -72,16 +72,17 @@ end
 -- Get Unit Name
 
 local function unitName(unit)
-	if not unit then return end
-	local unitName		= UnitName(unit) or ""
-	local Reaction		= UnitReaction(unit, "player") or 5
-	local Attackable	= UnitCanAttack("player", unit)
-	local Dead			= UnitIsDead(unit)
-	local AFK			= UnitIsAFK(unit)
-	local DND			= UnitIsDND(unit)
-	local Tapped		= UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit)
+        if not unit then return end
+        local unitName, unitRealm       = UnitName(unit) or ""
+        local Reaction                  = UnitReaction(unit, "player") or 5
+        local Attackable                = UnitCanAttack("player", unit)
+        local Dead                      = UnitIsDead(unit)
+        local AFK                       = UnitIsAFK(unit)
+        local DND                       = UnitIsDND(unit)
+        local Tapped                    = UnitIsTapped(unit) and not UnitIsTappedByPlayer(unit)
 
-	if Attackable then
+        if unitRealm then unitName = unitName.." - "..unitRealm end
+        if Attackable then
 		if Tapped or Dead then
 			return "|cff888888"..unitName.."|r"
 		else
