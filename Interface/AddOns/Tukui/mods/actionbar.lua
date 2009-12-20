@@ -226,7 +226,7 @@ end
     for i=1, 12 do
       local b = _G["MultiCastActionButton"..i], b2
       b:ClearAllPoints()
-      if i % 4 == true then
+      if i % 4 == 1 then
         b:SetPoint("LEFT",MultiCastSummonSpellButton,"RIGHT",stancepadding,0)
       else
         b2 = _G["MultiCastActionButton"..i-1]

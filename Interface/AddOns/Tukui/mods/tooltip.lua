@@ -31,20 +31,13 @@ local StatusBar = CreateFrame("StatusBar", nil, GameTooltip);
 -- Setup Anchor/Healthbar/Instanthide
 
 local function gtUpdate(self, ...)
-	local owner = self:GetOwner()	
+	local owner = self:GetOwner()
+	
 	if hide_all_tooltips == true then
 		self:Hide()
-	-- Align World Units/Objects to mouse
-	elseif mouseover_units == true and UnitExists("mouseover") and unitExists then
-		local scale = self:GetEffectiveScale()
-		local x, y = GetCursorPosition()
-		x, y = x / scale + -5, y / scale + 5
-		self:ClearAllPoints()
-		self:SetPoint("BOTTOMRIGHT", "UIParent", "BOTTOMLEFT", x, y)
 	end
 
 	-- Update Health bar for world units
-
 	if unitExists then
 			local currentHealth = UnitHealth("mouseover")
 			local green = currentHealth/maxHealth*2
@@ -55,9 +48,6 @@ local function gtUpdate(self, ...)
 		StatusBar:Hide()
 	end
 
-	-- we need to begin with this to fix a bug reported via beta forum when we disable "fadeout" : 
-	-- "I have to mouse over the roll frame multiple times before I get the tooltip."
-
 	if owner == UIParent then 
 		-- Instantly hide World Unit tooltips
 		if not UnitExists("mouseover") and unitExists then
@@ -65,6 +55,7 @@ local function gtUpdate(self, ...)
 			unitExists = false
 		elseif (hide_units == true and UnitExists("mouseover")) or (hide_units_combat == true and InCombatLockdown()) then
 			self:Hide()
+			unitExists = false
 		end
 	end
 end
@@ -226,13 +217,17 @@ local function gtDefault(tooltip, parent)
 	GameTooltipStatusBar:SetStatusBarTexture(BLANK_TEXTURE)
 	GameTooltipStatusBar:SetStatusBarColor(0.3, 0.9, 0.3, 1)
 	GameTooltipStatusBar:SetHeight(2)
-	tooltip:SetOwner(parent, "ANCHOR_NONE")
-	tooltip:ClearAllPoints()
-	tooltip:SetPoint(ttposZ,ttposX,ttposY)
-	tooltip.default = 1;
+	if cursortooltip == true then
+        tooltip:SetOwner(parent, "ANCHOR_CURSOR")
+        tooltip.default = 1;
+	else
+		tooltip:SetOwner(parent, "ANCHOR_NONE")
+		tooltip:ClearAllPoints()
+		tooltip:SetPoint(ttposZ,ttposX,ttposY)
+		tooltip.default = 1;
+	end
 end
 
 gt:HookScript("OnUpdate", gtUpdate)
 gt:HookScript("OnTooltipSetUnit", gtUnit)
 hooksecurefunc("GameTooltip_SetDefaultAnchor", gtDefault)
-

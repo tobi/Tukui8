@@ -167,11 +167,12 @@ tinfowidth = 370				-- set de width of left and right infos bars + chatframe wid
 -- Tooltip options
 ----------------------------------------------------------------------------------------
 
-mouseover_units = false 				-- show players, world objects, etc on mouseover
+cursortooltip = false					-- tooltip on cursor instead of fix position
 hide_units = false						-- always hide only units (npc, players, etc)
-hide_units_combat = false				-- hide units if in combat (useful when mouseover is active)
+hide_units_combat = false				-- hide units if in combat (useful when cursortooltip is active)
 hide_all_tooltips = false 				-- i don't recommend enabling this, this was a only request for a friend
 
+-- setting for fix position
 ttposX = -32 							-- LEFT(-) and RIGHT(+) position via posZ anchor
 ttposY = 48 							--  UP(+) and DOWN(-) position via posZ anchor
 ttposZ = "BOTTOMRIGHT" 					-- align to
