@@ -262,7 +262,24 @@ local function CreateStyle(self, unit)
 	name:SetFont(fontlol, 12, "THINOUTLINE")
 	name:SetPoint('LEFT', 3, 1)
 	self:Tag(name, '[name( )][leader( )]')
+	
+    self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
+    self.Leader:SetHeight(12)
+    self.Leader:SetWidth(12)
+    self.Leader:SetPoint("TOPLEFT", 0, 6)
 
+    self.MasterLooter = self.Health:CreateTexture(nil, "OVERLAY")
+    self.MasterLooter:SetHeight(12)
+    self.MasterLooter:SetWidth(12)
+    local MLAnchorUpdate = function (self)
+        if self.Leader:IsShown() then
+            self.MasterLooter:SetPoint("TOPLEFT", 12, 6)
+        else
+            self.MasterLooter:SetPoint("TOPLEFT", 0, 6)
+        end
+    end
+    self:RegisterEvent("PARTY_LEADER_CHANGED", MLAnchorUpdate)
+    self:RegisterEvent("PARTY_MEMBERS_CHANGED", MLAnchorUpdate)
 
 	self.DebuffHighlightAlpha = 1
 	self.DebuffHighlightBackdrop = true

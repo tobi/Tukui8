@@ -1,362 +1,564 @@
---[[
+local _, ns = ...
+local oUF = ns.oUF or oUF
 
-	Written By:  Derkyle
-	
-	Allows users to move custom oUF layout frames
-	
-	Usage:
-		[object].MoveableFrames = true   //sets the frame to be movable, must be done in the layout creation	
-		Several additional functions are provided below for BlackListing/Whitelisting Frames or declaring Header frames.
-	
-	NOTE: To move a frame you have to use the slash command /mvf
+assert(oUF, "oUF_MovableFrames was unable to locate oUF install.")
 
-	WARNING: Authors you MUST make sure your frames and objects are created with NAMES. 
-	If no names are provided then the library will return errors.
-	The library cannot possibly know how to save/restore a frame or object with no name.
-	
---]]
+-- The DB is organized as the following:
+-- {
+--    Lily = {
+--       player = "CENTER\031UIParent\0310\031-621",
+-- }
+--}
+local _DB
+local _LOCK
 
-if oUF == nil then return end
+local _BACKDROP = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background";
+}
 
-local blacklist = {}
-local whitelist = {}
-local headerlist = {}
-
---global locked variable
-oUF_MF_locked = true
-
-local function SaveLayout(frame)
-
-	if frame == nil then
-		DEFAULT_CHAT_FRAME:AddMessage("oUF_MoveableFrames: (ERROR) The [frame/object] your are attempting to reposition has no name.")
-		return
-	end
-	if oUF_MF == nil then oUF_MF = {} end
-
-	local opt = oUF_MF[frame] or nil;
-
-	if opt == nil then 
-		oUF_MF[frame] = {};
-		opt = oUF_MF[frame];
-	end
-
-	local f = getglobal(frame);
-	local scale = f:GetEffectiveScale();
-	opt.PosX = f:GetLeft() * scale;
-	opt.PosY = f:GetTop() * scale;
-	--opt.Width = f:GetWidth();
-	--opt.Height = f:GetHeight();
-
+local print = function(...)
+	return print('|cff33ff99oUF_MovableFrames:|r', ...)
+end
+local round = function(n)
+	return math.floor(n * 1e5 + .5) / 1e5
 end
 
-local function RestoreLayout(frame)
-	
-	if frame == nil then return end
-	if oUF_MF == nil then oUF_MF = {} end
+local backdropPool = {}
 
-	local f = getglobal(frame);
-	local opt = oUF_MF[frame] or nil;
+-- XXX: Should possibly just be replaced with something that steals the points
+-- of the anchor, as it does most of the work for us already.
+local getPoint = function(obj)
+	-- VARIABLE NAMES OF DOOM!
+	local S = obj:GetEffectiveScale()
+	local L, R = obj:GetLeft(), obj:GetRight()
+	local T, B = obj:GetTop(), obj:GetBottom()
+	local Cx, Cy = obj:GetCenter()
+	-- Quantum state!
+	if(not L) then return end
 
-	if opt == nil then return end
+	local width, height = UIParent:GetRight(), UIParent:GetTop()
+	local left = width / 3
+	local right = width - left
+	local bottom = height / 3
+	local top = height - bottom
 
-	local x = opt.PosX;
-	local y = opt.PosY;
-	local s = f:GetEffectiveScale();
-
-		if x == nil or y == nil then
-		f:ClearAllPoints();
-		f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
-		return 
-		end
-
-	--calculate the scale
-	x,y = x/s,y/s;
-
-	--set the location
-	f:ClearAllPoints();
-	f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y);
-
-end
-
-local function Update(object, event, unit)
-	if ( object.MoveableFrames ) then
-		--in the event that the initial load didn't reposition the frames
-		--run a one time event just in case
-		if (not object.MoveableFrames_RuneOnce) then
-			object.MoveableFrames_RuneOnce = true
-			RestoreLayout(object:GetName())
-		end
-	end
-end
-
-local function Enable(object)
-	if object:GetName() == nil then return end
-	
-	--BLACKLIST: check only for enabled objects and not custom ones
-	if blacklist[object:GetName()] ~= nil then
-		--a match is found so lets remove any data relevant to it
-		--object:IsUserPlaced() returns true/false if a user moved an frame
-		object:SetUserPlaced(false) --will remove it from the layout-local.txt
-		if oUF_MF[object:GetName()] ~= nil then oUF_MF[object:GetName()] = nil end --remove it from the local library DB
-		object:SetMovable(false);
-		object.isMoving = nil
-		return
-	end
-
-	if ( object.MoveableFrames ) then
-		
-		object:EnableMouse(true);
-		object:SetMovable(true);
-		object:SetClampedToScreen(true);
-
-		--add dragging
-		object:SetScript("OnMouseDown", function(frame, button)
-				--only move if the frames are unlocked
-				if not oUF_MF_locked then
-					frame.isMoving = true
-					frame:StartMoving()
-				end
-			end)
-
-		object:SetScript("OnMouseUp", function(frame, button) 
-
-				if( frame.isMoving ) then
-
-					frame.isMoving = nil
-					frame:StopMovingOrSizing()
-
-					SaveLayout(frame:GetName())
-				end
-
-			end)
-		
-		--restore any positions we have saved
-		RestoreLayout(object:GetName())
-
-		return true
-	end
-end
-
-local function Disable(object)
-
-	--remove the moving functions
-	object:SetScript("OnMouseDown", nil)
-	object:SetScript("OnMouseUp", nil)
-	
-end
-
---[[
-	These two functions will allow layout authors to designate which frames (custom or not) they want to be movable.
-	
-	BLKLST or BlackList:	Use this function if you want a frame to be added to a list of frames that cannot be moved.
-							Note: That blacklisted frames will have any position data stored automatically deleted.
-	
-	WHTLST or WhiteList:	Use this function if you want a frame to be added to a list of frames that can be moved.
-							Note: A profile will be automatically created both localy by Blizzard and by the library.
-							These local profiles will be used to make sure a position is moved correctly to where a user
-							has defined it to be displayed.
-							WARNING: THIS DOES NOT WORK WELL WITH HEADERS, INSTEAD USE THE HEADER FUNCTIONS BELOW
---]]
-
-function oUF_MoveableFrames_BLKLST(frame)
-	if frame == nil then return end
-	
-	local frameName
-	
-	if type(frame) == "string" then
-		frameName = frame
-	elseif type(frame) == "table" then
-		frameName = frame:GetName()
-	end
-	
-	if frameName == nil then
-		DEFAULT_CHAT_FRAME:AddMessage("oUF_MoveableFrames: (ERROR) Frame could not be added to BLKLST.")
-		return
-	end
-	
-	--add it to the blacklist table
-	blacklist[frameName] = true
-end
-
-function oUF_MoveableFrames_WHTLST(frame)
-	if frame == nil then return end
-	
-	local frameName
-	
-	if type(frame) == "string" then
-		frameName = frame
-	elseif type(frame) == "table" then
-		frameName = frame:GetName()
-	end
-	
-	if frameName == nil then
-		DEFAULT_CHAT_FRAME:AddMessage("oUF_MoveableFrames: (ERROR) Frame could not be added to WHTLST.")
-		return
-	end
-	
-	--add it to the whitelist table
-	whitelist[frameName] = true
-end
-
---[[
-	HEADERS:
-	This function will create a movable anchor for headers.  The anchor position will be stored and the frame will be 
-	repositioned based on the anchor position.  Please note that the frame will have it's SetPoint set to the anchor.
-	
-	WARNING:  Please pass the exact name of the header frame as it will be used to getglobal and SetPoint.  Failure to
-	do so will result in errors.  It is imperative that your header frames as well as the other frames or objects in your
-	layout have names.  You have been warned.
-	
-	Example: oUF_MoveableFrames_HEADER("oUF_Party", "This is the party frame anchor.", 23, -34)
-	
-	NOTE: ofsx and ofsy are initial coordinates, if the user moves the anchor then the default positions will be replaced.
---]]
-
-function oUF_MoveableFrames_HEADER(frame, desc, ofsx, ofsy)
-	if frame == nil then return end
-	
-	local frameName
-	
-	if type(frame) == "string" then
-		frameName = frame
-	elseif type(frame) == "table" then
-		frameName = frame:GetName()
-	end
-	
-	if frameName == nil then
-		DEFAULT_CHAT_FRAME:AddMessage("oUF_MoveableFrames: (ERROR) Frame could not be added to HEADER.")
-		return
-	end
-	
-	frameName = frameName.."AnchorFrm"
-	
-	if oUF_MF[frameName] == nil then
-		oUF_MF[frameName] = {}
-		oUF_MF[frameName].PosX = ofsx
-		oUF_MF[frameName].PosY = ofsy
-	end
-	
-	headerlist[frameName] = true
-
-	--create the anchor
-	local frameAnchor = CreateFrame("Frame", frameName, UIParent)
-	
-	frameAnchor:SetWidth(25)
-	frameAnchor:SetHeight(25)
-	frameAnchor:SetMovable(true)
-	frameAnchor:SetClampedToScreen(true)
-	frameAnchor:EnableMouse(true)
-	frameAnchor.desc = desc or frameName --store the description
-	
-	frameAnchor:ClearAllPoints()
-	frameAnchor:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", oUF_MF[frameName].PosX, oUF_MF[frameName].PosY)
-	frameAnchor:SetFrameStrata("DIALOG")
-	
-	frameAnchor:SetBackdrop({
-			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-			tile = true,
-			tileSize = 16,
-			edgeSize = 16,
-			insets = { left = 5, right = 5, top = 5, bottom = 5 }
-	})
-	frameAnchor:SetBackdropColor(0.75,0,0,1)
-	frameAnchor:SetBackdropBorderColor(0.75,0,0,1)
-
-	frameAnchor:SetScript("OnLeave",function(self)
-		GameTooltip:Hide()
-	end)
-
-	frameAnchor:SetScript("OnEnter",function(self)
-	
-		GameTooltip:SetOwner(self, "ANCHOR_NONE")
-		GameTooltip:SetPoint(OUF_MF_TipAnchor(self))
-		GameTooltip:ClearLines()
-
-		GameTooltip:AddLine(self:GetName())
-		GameTooltip:AddLine(self.desc)
-		GameTooltip:Show()
-	end)
-
-	frameAnchor:SetScript("OnMouseDown", function(frame, button)
-		if frame:IsMovable() then
-			frame.isMoving = true
-			frame:StartMoving()
-		end
-	end)
-
-	frameAnchor:SetScript("OnMouseUp", function(frame, button) 
-		if( frame.isMoving ) then
-			frame.isMoving = nil
-			frame:StopMovingOrSizing()
-			SaveLayout(frame:GetName())
-		end
-	end)
-	
-	frameAnchor:Hide() -- hide it by default
-			
-	--setpoint to the newly created anchor
-	getglobal(frame):ClearAllPoints()
-	getglobal(frame):SetPoint("TOPLEFT", frameAnchor, "BOTTOMRIGHT", 0, 0)
-
-	--just in case on load up (call me anal but it's better to be safe then sorry)
-	RestoreLayout(frameName)
-end
-
---tooltip position correction
-function OUF_MF_TipAnchor(frame)
-	local x,y = frame:GetCenter()
-	if not x or not y then return "TOPLEFT", "BOTTOMLEFT" end
-	local hhalf = (x > UIParent:GetWidth()*2/3) and "RIGHT" or (x < UIParent:GetWidth()/3) and "LEFT" or ""
-	local vhalf = (y > UIParent:GetHeight()/2) and "TOP" or "BOTTOM"
-	return vhalf..hhalf, frame, (vhalf == "TOP" and "BOTTOM" or "TOP")..hhalf
-end
-----------------------------------------
-----------------------------------------
-
-oUF:AddElement('MoveableFrames', Update, Enable, Disable)
-
-local eventFrame = CreateFrame("Frame", nil, UIParent)
-eventFrame:RegisterEvent("PLAYER_LOGIN")
-
-eventFrame:SetScript("OnEvent", function(self, event, ...)
-	if event == "PLAYER_LOGIN" then
-	
-		--do all the objects in the style OUF
-		for i, frame in ipairs(oUF.objects) do Enable(frame) end
-		
-		--WHITELIST: Enable custom items
-		for i, value in pairs(whitelist) do
-			if getglobal(i) ~= nil then
-				getglobal(i).MoveableFrames = true
-				Enable(getglobal(i))
-			end
-		end
-		
-		--HEADERS: Restore custom header positions
-		for i, value in pairs(headerlist) do
-			RestoreLayout(i)
-		end
-		
-	end
-end)
-
-local function SlashCommand(cmd)
-	if oUF_MF_locked then
-		oUF_MF_locked = false
-		for i, value in pairs(headerlist) do
-			getglobal(i):Show()
-		end
-		DEFAULT_CHAT_FRAME:AddMessage("oUF_MoveableFrames: Frames are now [UNLOCKED].")
+	local point, x, y
+	if(Cx >= left and not(Cx <= right)) then
+		point = 'RIGHT'
+		x = R - width
+	elseif(Cx <= left) then
+		point = 'LEFT'
+		x = L
 	else
-		oUF_MF_locked = true
-		for i, value in pairs(headerlist) do
-			getglobal(i):Hide()
-		end
-		DEFAULT_CHAT_FRAME:AddMessage("oUF_MoveableFrames: Frames are now [LOCKED].")
+		x = Cx - (width / 2)
 	end
-	return true
+
+	if(Cy > bottom and Cy < top) then
+		if(not point) then point = 'CENTER' end
+		y = Cy - (height / 2)
+	elseif(Cy >= bottom and not(Cy <= top)) then
+		point = 'TOP' .. (point or '')
+		y = T - height
+	elseif(Cy <= bottom) then
+		y = B
+		point = 'BOTTOM' .. (point or '')
+	end
+
+	return string.format(
+		'%s\031%s\031%d\031%d',
+		point, 'UIParent', round(x * S), round(y * S)
+	)
 end
 
-SLASH_OUFMOVEABLEFRAMES1 = "/mvf";
-SlashCmdList["OUFMOVEABLEFRAMES"] = SlashCommand;
+local getObjectInformation  = function(obj)
+	-- This won't be set if we're dealing with oUF <1.3.22. Due to this we're just
+	-- setting it to Unknown. It will only break if the user has multiple layouts
+	-- spawning the same unit or change between layouts.
+	local style = obj.style or 'Unknown'
+	local identifier = obj:GetName() or obj.unit
+
+	-- Are we dealing with header units?
+	local isHeader
+	local parent = obj:GetParent()
+	-- Check for both as we can hit parents with initialConfigFunction, and
+	-- SetManyAttributes alone is kinda up to the authors.
+	if(parent and parent.initialConfigFunction and parent.SetManyAttributes) then
+		isHeader = true
+
+		-- These always have a name, so we might as well abuse it.
+		identifier = parent:GetName()
+	end
+
+	return style, identifier, isHeader
+end
+
+local function restorePosition(obj)
+	local style, identifier, isHeader = getObjectInformation(obj)
+	-- We've not saved any custom position for this style.
+	if(not _DB[style] or not _DB[style][identifier]) then return end
+
+	local scale = UIParent:GetScale()
+	local parent = (isHeader and obj:GetParent())
+	local SetPoint = getmetatable(parent or obj).__index.SetPoint;
+
+	-- Hah, a spot you have to use semi-colon!
+	-- Guess I've never experienced that as these are usually wrapped in do end
+	-- statements.
+	(parent or obj).SetPoint = restorePosition;
+	(parent or obj):ClearAllPoints();
+
+	-- damn it Blizzard, _how_ did you manage to get the input of this function
+	-- reversed. Any sane person would implement this as: split(str, dlm, lim);
+	local point, parentName, x, y = string.split('\031', _DB[style][identifier])
+	SetPoint(parent or obj, point, parentName, point, x / scale, y / scale)
+end
+
+local savePosition = function(obj, override)
+	local style, identifier, isHeader = getObjectInformation(obj)
+	if(not _DB[style]) then _DB[style] = {} end
+
+	if(isHeader and not override) then
+		_DB[style][identifier] = getPoint(obj:GetParent())
+	else
+		_DB[style][identifier] = getPoint(override or obj)
+	end
+end
+
+-- Attempt to figure out a more sane name to dispaly.
+local smartName = function(obj, header)
+	if(type(obj) == 'string') then
+		-- Probably what we're after.
+		if(obj:match('_')) then
+			local name = obj:lower()
+			local group, id, subType = name:match('_([%a%d_]+)unitbutton(%d+)(%w+)$')
+			if(subType) then
+				return group .. id .. subType
+			end
+
+			-- odds of this being used is _slim_
+			local group, id = name:match('_([%a%d_]+)unitbutton(%d+)$')
+			if(id) then
+				return group .. id
+			end
+
+			local group = name:match('_([%a%d_]+)')
+			if(group) then
+				return group
+			end
+		else
+			return obj
+		end
+	else
+		if(header) then
+			-- XXX: Check the attributes for a valid description.
+			local name = header:GetName()
+			local group = name:lower():match('_([%a%d_]+)')
+			if(group) then
+				return group:gsub('frames?', '')
+			else
+				return name
+			end
+
+			return header:GetName()
+		else
+			local match = (obj.hasChildren and '_([%a_]+)unitbutton(%d+)$') or '_([%a_]+)unitbutton(%d+)(%w+)$'
+			local name = obj:GetName()
+			if(name) then
+				local group, id, subType = name:lower():match(match)
+				if(subType) then
+					return group .. id .. subType
+				elseif(id) then
+					return group .. id
+				end
+			end
+
+			return obj.unit or '<unknown>'
+		end
+	end
+end
+
+do
+	local frame = CreateFrame"Frame"
+	frame:SetScript("OnEvent", function(self)
+		return self[event](self)
+	end)
+
+	function frame:VARIABLES_LOADED()
+		-- I honestly don't trust the load order of SVs.
+		_DB = bb08df87101dd7f2161e5b77cf750f753c58ef1b or {}
+		bb08df87101dd7f2161e5b77cf750f753c58ef1b = _DB
+		-- Got to catch them all!
+		for _, obj in next, oUF.objects do
+			restorePosition(obj)
+		end
+
+		oUF:RegisterInitCallback(restorePosition)
+		self:UnregisterEvent"VARIABLES_LOADED"
+		self.VARIABLES_LOADED = nil
+	end
+	frame:RegisterEvent"VARIABLES_LOADED"
+
+	function frame:PLAYER_REGEN_DISABLED()
+		if(_LOCK) then
+			print("Anchors hidden due to combat.")
+			for k, bdrop in next, backdropPool do
+				bdrop:Hide()
+			end
+			_LOCK = nil
+		end
+	end
+	frame:RegisterEvent"PLAYER_REGEN_DISABLED"
+end
+
+local getBackdrop
+do
+	local OnShow = function(self)
+		return self.name:SetText(smartName(self.obj, self.header))
+	end
+
+	local OnDragStart = function(self)
+		self:StartMoving()
+
+		local frame = self.header or self.obj
+		frame:ClearAllPoints();
+		frame:SetAllPoints(self);
+	end
+
+	local OnDragStop = function(self)
+		self:StopMovingOrSizing()
+		savePosition(self.obj, self.header and self)
+	end
+
+	getBackdrop = function(obj, isHeader)
+		local header = (isHeader and obj:GetParent())
+		if(not getPoint(header or obj)) then return end
+		if(backdropPool[header or obj]) then return backdropPool[header or obj] end
+
+		local backdrop = CreateFrame"Frame"
+		backdrop:Hide()
+
+		backdrop:SetBackdrop(_BACKDROP)
+		backdrop:SetFrameStrata"TOOLTIP"
+		backdrop:SetScale(obj:GetEffectiveScale())
+		backdrop:SetAllPoints(header or obj)
+
+		backdrop:EnableMouse(true)
+		backdrop:SetMovable(true)
+		backdrop:RegisterForDrag"LeftButton"
+
+		backdrop:SetScript("OnShow", OnShow)
+
+		local name = backdrop:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		name:SetPoint"CENTER"
+		name:SetJustifyH"CENTER"
+		name:SetFont(GameFontNormal:GetFont(), 12)
+		name:SetTextColor(1, 1, 1)
+
+		backdrop.name = name
+		backdrop.obj = obj
+		backdrop.header = header
+
+		backdrop:SetBackdropBorderColor(0, .9, 0)
+		backdrop:SetBackdropColor(0, .9, 0)
+
+		-- Work around the fact that headers with no units displayed are 0 in height.
+		if(header and math.floor(header:GetHeight()) == 0) then
+			local height = header:GetChildren():GetHeight()
+			header:SetHeight(height)
+		end
+
+		backdrop:SetScript("OnDragStart", OnDragStart)
+		backdrop:SetScript("OnDragStop", OnDragStop)
+
+		backdropPool[header or obj] = backdrop
+
+		return backdrop
+	end
+end
+
+do
+	local opt = CreateFrame("Frame", nil, InterfaceOptionsFramePanelContainer)
+	opt:Hide()
+
+	opt.name = "oUF: MovableFrames"
+	opt:SetScript("OnShow", function(self)
+		local title = self:CreateFontString(nil, 'ARTWORK', 'GameFontNormalLarge')
+		title:SetPoint('TOPLEFT', 16, -16)
+		title:SetText'oUF: MovableFrames'
+
+		local subtitle = self:CreateFontString(nil, 'ARTWORK', 'GameFontHighlightSmall')
+		subtitle:SetHeight(40)
+		subtitle:SetPoint('TOPLEFT', title, 'BOTTOMLEFT', 0, -8)
+		subtitle:SetPoint('RIGHT', self, -32, 0)
+		subtitle:SetNonSpaceWrap(true)
+		subtitle:SetWordWrap(true)
+		subtitle:SetJustifyH'LEFT'
+		subtitle:SetText('Note that the initial frame position set by layouts are currently'
+		.. ' not saved. This means that a reload of the UI is required to correctly reset'
+		.. ' the position after deleting an element.')
+
+		local scroll = CreateFrame("ScrollFrame", nil, self)
+		scroll:SetPoint('TOPLEFT', subtitle, 'BOTTOMLEFT', 0, -8)
+		scroll:SetPoint("BOTTOMRIGHT", 0, 4)
+
+		local scrollchild = CreateFrame("Frame", nil, self)
+		scrollchild:SetPoint"LEFT"
+		scrollchild:SetHeight(scroll:GetHeight())
+		scrollchild:SetWidth(scroll:GetWidth())
+
+		scroll:SetScrollChild(scrollchild)
+		scroll:UpdateScrollChildRect()
+		scroll:EnableMouseWheel(true)
+
+		local slider = CreateFrame("Slider", nil, scroll)
+
+		local backdrop = {
+			bgFile = [[Interface\ChatFrame\ChatFrameBackground]], tile = true, tileSize = 16,
+			edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]], edgeSize = 16,
+			insets = {left = 4, right = 4, top = 4, bottom = 4},
+		}
+
+		local createOrUpdateMadnessOfGodIhateGUIs
+		local OnClick = function(self)
+			scroll.value = slider:GetValue()
+			_DB[self.style][self.ident] = nil
+
+			if(not next(_DB[self.style])) then
+				_DB[self.style] = nil
+			end
+
+			return createOrUpdateMadnessOfGodIhateGUIs()
+		end
+
+		local OnEnter = function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+			GameTooltip:SetText(DELETE)
+		end
+
+		function createOrUpdateMadnessOfGodIhateGUIs()
+			local data = self.data or {}
+
+			local slideHeight = 0
+			local numStyles = 1
+			for style, styleData in next, _DB do
+				if(not data[numStyles]) then
+					local box = CreateFrame('Frame', nil, scrollchild)
+					box:SetBackdrop(backdrop)
+					box:SetBackdropColor(.1, .1, .1, .5)
+					box:SetBackdropBorderColor(.3, .3, .3, 1)
+
+					if(numStyles == 1) then
+						box:SetPoint('TOP', 0, -12)
+					else
+						box:SetPoint('TOP', data[numStyles - 1], 'BOTTOM', 0, -16)
+					end
+					box:SetPoint'LEFT'
+					box:SetPoint('RIGHT', -30, 0)
+
+					local title = box:CreateFontString(nil, 'ARTWORK', 'GameFontHighlightSmall')
+					title:SetPoint('BOTTOMLEFT', box, 'TOPLEFT', 8, 0)
+					box.title = title
+
+					data[numStyles] = box
+				end
+
+				-- Fetch the box and update it
+				local box = data[numStyles]
+				box.title:SetText(style)
+
+				local rows = box.rows or {}
+				local numFrames = 1
+				for unit, points in next, styleData do
+					if(not rows[numFrames]) then
+						local row = CreateFrame('Button', nil, box)
+
+						row:SetBackdrop(backdrop)
+						row:SetBackdropBorderColor(.3, .3, .3)
+						row:SetBackdropColor(.1, .1, .1, .5)
+
+						if(numFrames == 1) then
+							row:SetPoint('TOP', 0, -8)
+						else
+							row:SetPoint('TOP', rows[numFrames-1], 'BOTTOM')
+						end
+
+						row:SetPoint('LEFT', 6, 0)
+						row:SetPoint('RIGHT', -25, 0)
+						row:SetHeight(24)
+
+						local anchor = row:CreateFontString(nil, nil, 'GameFontHighlight')
+						anchor:SetPoint('RIGHT', -10, 0)
+						anchor:SetPoint('TOP', 0, -4)
+						anchor:SetPoint'BOTTOM'
+						anchor:SetJustifyH'RIGHT'
+						row.anchor = anchor
+
+						local label = row:CreateFontString(nil, nil, 'GameFontHighlight')
+						label:SetPoint('LEFT', 10, 0)
+						label:SetPoint('RIGHT', anchor)
+						label:SetPoint('TOP', 0, -4)
+						label:SetPoint'BOTTOM'
+						label:SetJustifyH'LEFT'
+						row.label = label
+
+						local delete = CreateFrame("Button", nil, row)
+						delete:SetWidth(16)
+						delete:SetHeight(16)
+						delete:SetPoint('LEFT', row, 'RIGHT')
+
+						delete:SetNormalTexture[[Interface\Buttons\UI-Panel-MinimizeButton-Up]]
+						delete:SetPushedTexture[[Interface\Buttons\UI-Panel-MinimizeButton-Down]]
+						delete:SetHighlightTexture[[Interface\Buttons\UI-Panel-MinimizeButton-Highlight]]
+
+						delete:SetScript("OnClick", OnClick)
+						delete:SetScript("OnEnter", OnEnter)
+						delete:SetScript("OnLeave", GameTooltip_Hide)
+						row.delete = delete
+
+						rows[numFrames] = row
+					end
+
+					-- Fetch row and update it:
+					local row = rows[numFrames]
+					local point, _, x, y = string.split('\031', points)
+					row.anchor:SetFormattedText('%11s %4s %4s', point, x, y)
+					row.label:SetText(smartName(unit))
+
+					row.delete.style = style
+					row.delete.ident = unit
+					row:Show()
+
+					numFrames = numFrames + 1
+				end
+
+				box.rows = rows
+
+				local height = (numFrames * 24) - 8
+				slideHeight = slideHeight + height + 16
+				box:SetHeight(height)
+				box:Show()
+
+				-- Hide left over rows we aren't using:
+				while(rows[numFrames]) do
+					rows[numFrames]:Hide()
+					numFrames = numFrames + 1
+				end
+
+				numStyles = numStyles + 1
+			end
+
+			-- Hide left over boxes we aren't using:
+			while(data[numStyles]) do
+				data[numStyles]:Hide()
+				numStyles = numStyles + 1
+			end
+
+			self.data = data
+			local height = slideHeight - scroll:GetHeight()
+			if(height > 0) then
+				slider:SetMinMaxValues(0, height)
+			else
+				slider:SetMinMaxValues(0, 0)
+			end
+
+			slider:SetValue(scroll.value or 0)
+		end
+
+		slider:SetWidth(16)
+
+		slider:SetPoint("TOPRIGHT", -8, -24)
+		slider:SetPoint("BOTTOMRIGHT", -8, 24)
+
+		local up = CreateFrame("Button", nil, slider)
+		up:SetPoint("BOTTOM", slider, "TOP")
+		up:SetWidth(16)
+		up:SetHeight(16)
+		up:SetNormalTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up")
+		up:SetPushedTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down")
+		up:SetDisabledTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled")
+		up:SetHighlightTexture("Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Highlight")
+
+		up:GetNormalTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		up:GetPushedTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		up:GetDisabledTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		up:GetHighlightTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		up:GetHighlightTexture():SetBlendMode("ADD")
+
+		up:SetScript("OnClick", function(self)
+			local box = self:GetParent()
+			box:SetValue(box:GetValue() - box:GetHeight()/2)
+		end)
+
+		local down = CreateFrame("Button", nil, slider)
+		down:SetPoint("TOP", slider, "BOTTOM")
+		down:SetWidth(16)
+		down:SetHeight(16)
+		down:SetNormalTexture("Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up")
+		down:SetPushedTexture("Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down")
+		down:SetDisabledTexture("Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled")
+		down:SetHighlightTexture("Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Highlight")
+
+		down:GetNormalTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		down:GetPushedTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		down:GetDisabledTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		down:GetHighlightTexture():SetTexCoord(1/4, 3/4, 1/4, 3/4)
+		down:GetHighlightTexture():SetBlendMode("ADD")
+
+		down:SetScript("OnClick", function(self)
+			local box = self:GetParent()
+			box:SetValue(box:GetValue() + box:GetHeight()/2)
+		end)
+
+		slider:SetThumbTexture("Interface\\Buttons\\UI-ScrollBar-Knob")
+		local thumb = slider:GetThumbTexture()
+		thumb:SetWidth(16)
+		thumb:SetHeight(24)
+		thumb:SetTexCoord(1/4, 3/4, 1/8, 7/8)
+
+		slider:SetScript("OnValueChanged", function(self, val, ...)
+			local min, max = self:GetMinMaxValues()
+			if(val == min) then up:Disable() else up:Enable() end
+			if(val == max) then down:Disable() else down:Enable() end
+
+			scroll.value = val
+			scroll:SetVerticalScroll(val)
+			scrollchild:SetPoint('TOP', 0, val)
+		end)
+
+		opt:SetScript("OnShow", function()
+			return createOrUpdateMadnessOfGodIhateGUIs()
+		end)
+
+		return createOrUpdateMadnessOfGodIhateGUIs()
+	end)
+
+	InterfaceOptions_AddCategory(opt)
+end
+
+SLASH_OUF_MOVABLEFRAMES1 = '/omf'
+SlashCmdList['OUF_MOVABLEFRAMES'] = function(inp)
+	if(InCombatLockdown()) then
+		return print"Frames cannot be moved while in combat. Bailing out."
+	end
+
+	if(inp:match("%S+")) then
+		InterfaceOptionsFrame_OpenToCategory'oUF: MovableFrames'
+	else
+		if(not _LOCK) then
+			for k, obj in next, oUF.objects do
+				local style, identifier, isHeader = getObjectInformation(obj)
+				local backdrop = getBackdrop(obj, isHeader)
+				if(backdrop) then backdrop:Show() end
+			end
+
+			_LOCK = true
+		else
+			for k, bdrop in next, backdropPool do
+				bdrop:Hide()
+			end
+
+			_LOCK = nil
+		end
+	end
+end
+-- It's not in your best interest to disconnect me. Someone could get hurt.

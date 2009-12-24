@@ -1,6 +1,6 @@
 ## Interface: 30300
 ## Author: Tukz
-## Version: 8.12
+## Version: 8.20
 ## Title: |cffC495DDTukui|r
 ## Notes: UI of awesomeness!
 ## SavedVariables: tCooldownTracker_Saved
@@ -15,8 +15,8 @@ mods\nameplates.lua
 mods\bag.core.lua
 mods\bag.helpers.lua
 mods\bag.handlers.lua
-mods\keys\basic.lua
-mods\keys\tooltip.lua
+mods\bag.basic.lua
+mods\bag.tooltip.lua
 mods\plugins\bagbar.lua
 mods\plugins\databroker.lua
 mods\plugins\money.lua
@@ -34,6 +34,7 @@ mods\plugins\experience.lua
 mods\plugins\moveframe.lua
 mods\plugins\reputation.lua
 mods\plugins\threat.lua
+mods\plugins\trinkets.lua
 mods\tags.lua
 mods\unitframe.lua
 mods\weaksoul.lua

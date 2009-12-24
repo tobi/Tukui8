@@ -540,6 +540,24 @@ end
 -- CREDIT: FatalEntity for some part of this code
 --------------------------------------------------------------------	
 local L = GetLocale()
+
+local function panel_setpoint(p, obj)
+	  if p == 1 then
+		obj:SetPoint("LEFT", ileft, "LEFT", 30, 1)
+	  elseif p == 2 then
+		obj:SetPoint("CENTER", ileft, "CENTER", 0, 1)
+	  elseif p == 3 then
+		obj:SetPoint("RIGHT", ileft, "RIGHT", -30, 1)
+	  elseif p == 4 then
+		obj:SetPoint("LEFT", iright, "LEFT", 30, 1)
+	  elseif p == 5 then
+		obj:SetPoint("CENTER", iright, "CENTER", 0, 1)
+	  elseif p == 6 then
+		obj:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
+	  else
+		obj:Hide()
+	  end
+end
 --------------------------------------------------------------------
 -- FPS
 --------------------------------------------------------------------
@@ -549,21 +567,7 @@ if fps_ms > 0 then
 
 	local Text  = ileft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if fps_ms == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif fps_ms == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif fps_ms == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif fps_ms == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif fps_ms == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif fps_ms == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end
+	panel_setpoint(fps_ms, Text)
 	Text:SetHeight(20)
 
 	local int = 1
@@ -599,21 +603,7 @@ if mem > 0 then
 
 	local Text  = ileft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if mem == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif mem == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif mem == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif mem == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif mem == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif mem == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end 
+	panel_setpoint(mem, Text)
 	Text:SetHeight(20)
 
 	local function formatMem(memory, color)
@@ -741,21 +731,7 @@ if guild > 0 then
 
 	local Text  = ileft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if guild == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif guild == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif guild == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif guild == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif guild == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif guild == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end
+	panel_setpoint(guild, Text)
 	Text:SetHeight(20)
 
 	local function Update(self, event, ...)	
@@ -832,21 +808,7 @@ if bags > 0 then
 
 	local Text  = ileft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if bags == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif bags == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif bags == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif bags == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif bags == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif bags == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end
+	panel_setpoint(bags, Text)
 	Text:SetHeight(20)
 
 	local function OnEvent(self, event, ...)
@@ -877,21 +839,7 @@ if friends > 0 then
 
 	local Text  = ileft:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if friends == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif friends == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif friends == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif friends == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif friends == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif friends == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end 
+	panel_setpoint(friends, Text)
 	Text:SetHeight(20)
 
 	local function Update(self, event)
@@ -952,21 +900,7 @@ if armor > 0 then
 
 	local Text  = iright:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if armor == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif armor == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif armor == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif armor == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif armor == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif armor == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end 
+	panel_setpoint(armor, Text)
 	Text:SetHeight(20)
 
 	local Total = 0
@@ -1028,21 +962,7 @@ if gold > 0 then
 
 	local Text  = iright:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if gold == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif gold == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif gold == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif gold == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif gold == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif gold == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end 
+	panel_setpoint(gold, Text)
 	Text:SetHeight(20)
 
 	local Profit	= 0
@@ -1146,21 +1066,7 @@ if wowtime > 0 then
 
 	local Text  = iright:CreateFontString(nil, "OVERLAY")
 	Text:SetFont(FONT, tfontsize)
-	if wowtime == 1 then
-		Text:SetPoint("LEFT", ileft, "LEFT", 30, 1)
-	elseif wowtime == 2 then
-		Text:SetPoint("CENTER", ileft, "CENTER", 0, 1) 
-	elseif wowtime == 3 then
-		Text:SetPoint("RIGHT", ileft, "RIGHT", -30, 1) 
-	elseif wowtime == 4 then
-		Text:SetPoint("LEFT", iright, "LEFT", 30, 1) 
-	elseif wowtime == 5 then
-		Text:SetPoint("CENTER", iright, "CENTER", 0, 1)
-	elseif wowtime == 6 then
-		Text:SetPoint("RIGHT", iright, "RIGHT", -30, 1)
-	else
-		Text:Hide()
-	end 
+	panel_setpoint(wowtime, Text)
 	Text:SetHeight(20)
 
 	local int = 1

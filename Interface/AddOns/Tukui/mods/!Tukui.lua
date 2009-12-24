@@ -339,14 +339,14 @@ end);
 hooksecurefunc(DurabilityFrame,"SetPoint",function(self,_,parent) -- durability frame
     if (parent == "MinimapCluster") or (parent == _G["MinimapCluster"]) then
         DurabilityFrame:ClearAllPoints();
-        DurabilityFrame:SetPoint("BOTTOM",UIParent,"BOTTOM",0,160);
+        DurabilityFrame:SetPoint("BOTTOM",UIParent,"BOTTOM",0,200);
     end
 end);
 
 hooksecurefunc(VehicleSeatIndicator,"SetPoint",function(_,_,parent) -- vehicle seat indicator
     if (parent == "MinimapCluster") or (parent == _G["MinimapCluster"]) then
         VehicleSeatIndicator:ClearAllPoints();
-        VehicleSeatIndicator:SetPoint("BOTTOM",UIParent,"BOTTOM",0,160);
+        VehicleSeatIndicator:SetPoint("BOTTOM",UIParent,"BOTTOM",0,200);
     end
 end);
 

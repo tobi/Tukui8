@@ -679,8 +679,12 @@ local SetStyle = function(self, unit)
 			self:Tag(self.Info, "[GetNameColor][NameLong] [DiffColor][level] [shortclassification]")
 		elseif (unit and unit:find("arena%d")) then
 			self.Info = SetFontString(self.Health, font, 12, "OUTLINE")
-			self.Info:SetPoint("CENTER", 6, 0)
-			self:Tag(self.Info, "[GetNameColor][NameLong]")			
+			self.Info:SetPoint("CENTER", 0, 1)
+			self:Tag(self.Info, "[GetNameColor][NameLong]")
+		elseif (self:GetParent():GetName():match"oUF_MainTank" or self:GetParent():GetName():match"oUF_MainAssist") then
+			self.Info = SetFontString(self.Health, font, 12, "OUTLINE")
+			self.Info:SetPoint("CENTER", 0, 1)
+			self:Tag(self.Info, "[GetNameColor][NameLong]")		
 		elseif unit == "pet" then
 			self.Info:SetPoint("CENTER", 0, -23)
 			self:Tag(self.Info, "[GetNameColor][NameLong] [DiffColor][level] [shortclassification]")
@@ -977,7 +981,19 @@ local SetStyle = function(self, unit)
 				self.CPoints[4]:SetVertexColor(0.65, 0.63, 0.35)
 				self.CPoints[5]:SetVertexColor(0.33, 0.59, 0.33)
 				self:RegisterEvent("UNIT_COMBO_POINTS", UpdateCPoints)
-			end		
+			end
+			if(unit and unit:find("arena%d")) then
+				self.Debuffs = CreateFrame("Frame", nil, self)
+				self.Debuffs.num = 5
+				self.Debuffs.size = 28
+				self.Debuffs:SetPoint("TOPRIGHT", self, "TOPRIGHT", 34, -1)
+				self.Debuffs.initialAnchor = "TOPRIGHT"
+				self.Debuffs["growth-x"] = "RIGHT"
+				self.Debuffs["growth-y"] = "DOWN"
+				self.Debuffs:SetHeight(24)
+				self.Debuffs:SetWidth(175)
+				self.Debuffs.spacing = 3
+			end			
 			
 			if (unit == "player" or unit == "target") and (charportrait == true) then
 				self.Portrait = CreateFrame("PlayerModel", nil, self)
@@ -1114,19 +1130,6 @@ local SetStyle = function(self, unit)
 			end
 		end
 		
-		if(unit and unit:find("arena%d")) then
-			self.Debuffs = CreateFrame("Frame", nil, self)
-			self.Debuffs.num = 5
-			self.Debuffs.size = 28
-			self.Debuffs:SetPoint("TOPRIGHT", self, "TOPRIGHT", 34, -1)
-			self.Debuffs.initialAnchor = "TOPRIGHT"
-			self.Debuffs["growth-x"] = "RIGHT"
-			self.Debuffs["growth-y"] = "DOWN"
-			self.Debuffs:SetHeight(24)
-			self.Debuffs:SetWidth(175)
-			self.Debuffs.spacing = 3
-		end
-		
 		if unit == "player" and cblatency == true then
 			self.Castbar.SafeZone = self.Castbar:CreateTexture(nil, "ARTWORK")
 			self.Castbar.SafeZone:SetTexture(normTex)
@@ -1144,7 +1147,37 @@ local SetStyle = function(self, unit)
 		self.Leader:SetWidth(14)
 		self.Leader:SetPoint("TOPLEFT", 0, 10)
 	end
+		
+------------------------------------------------------------------------
+--      Master Looter
+------------------------------------------------------------------------
 
+        if not unit or unit == "player" then
+                self.MasterLooter = self.Health:CreateTexture(nil, "OVERLAY")
+                self.MasterLooter:SetHeight(14)
+                self.MasterLooter:SetWidth(14)
+                local MLAnchorUpdate = function (self)
+                        if self.Leader:IsShown() then
+                                self.MasterLooter:SetPoint("TOPLEFT", 14, 10)
+                        else
+                                self.MasterLooter:SetPoint("TOPLEFT", 0, 10)
+                        end
+                end
+                self:RegisterEvent("PARTY_LEADER_CHANGED", MLAnchorUpdate)
+                self:RegisterEvent("PARTY_MEMBERS_CHANGED", MLAnchorUpdate)
+        end
+
+------------------------------------------------------------------------
+--	Arena Trinket
+------------------------------------------------------------------------	
+	if t_arena == true then
+		if (unit and unit:find('arena%d') and (not unit:find("arena%dtarget"))) then
+			self.Trinket = CreateFrame("Frame", nil, self)
+			self.Trinket:SetHeight(31)
+			self.Trinket:SetWidth(31)
+			self.Trinket:SetPoint("TOPRIGHT", self, "TOPLEFT", -4, 1)
+		end
+	end
 ------------------------------------------------------------------------
 --	Unitframes Width/Height
 ------------------------------------------------------------------------
@@ -1166,6 +1199,18 @@ local SetStyle = function(self, unit)
 	elseif (unit and unit:find("arena%d")) then
 		self:SetAttribute("initial-height", 29)
 		self:SetAttribute("initial-width", 200)
+	elseif(self:GetParent():GetName():match"oUF_MainTank" or self:GetParent():GetName():match"oUF_MainAssist") then
+		if t_mt_power == true then
+			self.Power:SetHeight(2)
+			self.Power.value:Hide()
+			self.Health:SetHeight(17)
+		else
+			self.Power:Hide()
+			self.Health:SetHeight(20)
+		end
+		
+		self:SetAttribute("initial-height", 20)
+		self:SetAttribute("initial-width", 100)
 	else
 		self:SetAttribute("initial-height", 37)
 		self:SetAttribute("initial-width", 249)		
@@ -1330,6 +1375,19 @@ end
 local party = oUF:Spawn("header", "oUF_PartyHide")
 party:SetAttribute("showParty", false)
 
+if t_mt == true then
+	local tank = oUF:Spawn("header", "oUF_MainTank")
+	tank:SetManyAttributes("showRaid", true, "groupFilter", "MAINTANK", "yOffset", 5, "point" , "BOTTOM")
+	tank:SetPoint("BOTTOM", UIParent, "BOTTOM", MTX, MTY)
+	tank:SetAttribute("template", "oUF_tukzMtt")
+	tank:Show()
+
+	local assist = oUF:Spawn("header", "oUF_MainAssist")
+	assist:SetManyAttributes("showRaid", true, "groupFilter", "MAINASSIST", "yOffset", 5, "point", "BOTTOM")
+	assist:SetPoint("TOP", tank, "BOTTOM", 0, -30)
+	assist:SetAttribute("template", "oUF_tukzMtt")
+	assist:Show()
+end
 
 
 

@@ -71,6 +71,16 @@ ws_show_time = false 						-- show time remaining on weakened soul bar
 ws_show_player = true 						-- show a weakened soul debuff on you
 if_warning = true							-- innerfire warning icon when not active and in combat
 
+----------------------------------------------------------------------------------------
+-- PVE : MAIN TANK & MAIN ASSIST (this feature is implemented by Dors)
+----------------------------------------------------------------------------------------
+
+-- enable main tank & main assist frames
+t_mt = false
+t_mt_power = false
+
+MTX = 500
+MTY = 460
 
 ----------------------------------------------------------------------------------------
 -- ARENA
