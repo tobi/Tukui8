@@ -238,7 +238,7 @@ local function CreateStyle(self, unit)
 	
 	self.PostUpdateHealth = updateHealth
 	
-	if raidunitdebuffwatch == true then
+	if not unit and raidunitdebuffwatch == true then
 		createAuraWatch(self,unit)
     end
 
