@@ -923,11 +923,7 @@ local SetStyle = function(self, unit)
                    self.TotemBar[i]:SetPoint("TOPLEFT", self.TotemBar[i-1], "TOPRIGHT", 1, 0)
                 end
                 self.TotemBar[i]:SetStatusBarTexture(normTex)
-                if t_totembar_title then
-                	self.TotemBar[i]:SetHeight(10)
-                else
-                	self.TotemBar[i]:SetHeight(8)
-                end
+                self.TotemBar[i]:SetHeight(8)
                 self.TotemBar[i]:SetWidth(250 / 4 - 0.85)
                 self.TotemBar[i]:SetBackdrop(backdrop)
                 self.TotemBar[i]:SetBackdropColor(0, 0, 0)
