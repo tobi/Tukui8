@@ -198,7 +198,7 @@ end
   PossessButton1:SetPoint("BOTTOMLEFT", fshift, "BOTTOMLEFT", 10, 10);
   
     --totem bar (idea borrowed from avis57, author of Movable Totem Frame add-on)
-  if select(2, UnitClass("Player")) == "SHAMAN" then
+  if UnitLevel("player") >= 30 and select(2, UnitClass("Player")) == "SHAMAN" then
     MultiCastSummonSpellButton:SetParent(fshift)
     for i=1, 4 do
       _G["MultiCastSlotButton"..i]:SetParent(fshift)

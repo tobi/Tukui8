@@ -908,6 +908,49 @@ local SetStyle = function(self, unit)
 		  self.ThreatBar.useRawThreat = false
 	   end
 	end
+	
+------------------------------------------------------------------------
+--   Totems
+------------------------------------------------------------------------   
+
+    if class == "SHAMAN" and unit == "player" then
+        self.TotemBar = {}
+            for i = 1, 4 do
+                self.TotemBar[i] = CreateFrame("StatusBar", self:GetName().."_TotemBar"..i, self.Health)
+                if (i == 1) then
+                   self.TotemBar[i]:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT", 0, 1)
+                else
+                   self.TotemBar[i]:SetPoint("TOPLEFT", self.TotemBar[i-1], "TOPRIGHT", 1, 0)
+                end
+                self.TotemBar[i]:SetStatusBarTexture(normTex)
+                if t_totembar_title then
+                	self.TotemBar[i]:SetHeight(10)
+                else
+                	self.TotemBar[i]:SetHeight(8)
+                end
+                self.TotemBar[i]:SetWidth(250 / 4 - 0.85)
+                self.TotemBar[i]:SetBackdrop(backdrop)
+                self.TotemBar[i]:SetBackdropColor(0, 0, 0)
+                self.TotemBar[i]:SetMinMaxValues(0, 1)
+
+                self.TotemBar[i].bg = self.TotemBar[i]:CreateTexture(nil, "BORDER")
+                self.TotemBar[i].bg:SetAllPoints(self.TotemBar[i])
+                self.TotemBar[i].bg:SetTexture(normTex)
+                self.TotemBar[i].bg.multiplier = 0.6
+                				
+				self.TotemBar[i].FrameBackdrop = CreateFrame("Frame", nil, self.TotemBar[i])
+				self.TotemBar[i].FrameBackdrop:SetPoint("TOPLEFT", self.TotemBar[i], "TOPLEFT", -3.5, 3.5)
+				self.TotemBar[i].FrameBackdrop:SetPoint("BOTTOMRIGHT", self.TotemBar[i], "BOTTOMRIGHT", 3.5, -3)
+				self.TotemBar[i].FrameBackdrop:SetFrameStrata("BACKGROUND")
+				self.TotemBar[i].FrameBackdrop:SetBackdrop {
+					edgeFile = glowTex, edgeSize = 4,
+					insets = {left = 3, right = 3, top = 3, bottom = 3}
+				}
+				self.TotemBar[i].FrameBackdrop:SetBackdropColor(0, 0, 0, 0)
+				self.TotemBar[i].FrameBackdrop:SetBackdropBorderColor(0, 0, 0)
+            end
+    end
+
 ------------------------------------------------------------------------
 --	Auras
 ------------------------------------------------------------------------	

@@ -1,6 +1,6 @@
 ## Interface: 30300
 ## Author: Tukz
-## Version: 8.21
+## Version: 8.22
 ## Title: |cffC495DDTukui|r
 ## Notes: UI of awesomeness!
 ## SavedVariables: tCooldownTracker_Saved bb08df87101dd7f2161e5b77cf750f753c58ef1b
@@ -35,6 +35,7 @@ mods\plugins\moveframe.lua
 mods\plugins\reputation.lua
 mods\plugins\threat.lua
 mods\plugins\trinkets.lua
+mods\plugins\totem.lua
 mods\tags.lua
 mods\unitframe.lua
 mods\weaksoul.lua
