@@ -33,7 +33,7 @@ if(AutoScale==true) then
     scalefix:SetScript("OnEvent", function()
         local index = GetCurrentResolution();
 		local resolution = select(index, GetScreenResolutions());
-        if(resolution == "1680x1050" or resolution == "1920x1080" or resolution == "1920x1200" or resolution == "1600x900" or resolution == "2048x1152" or resolution == "1776x1000" or resolution == "2560x1600" or resolution == "1600x1200") then
+        if(resolution == "1680x1050" or resolution == "1920x1080" or resolution == "1920x1200" or resolution == "1600x900" or resolution == "2048x1152" or resolution == "1776x1000" or resolution == "2560x1600" or resolution == "2560x1440" or resolution == "1600x1200") then
 			SetCVar("useUiScale", 1)
             SetCVar("uiScale", 768/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)"));
 			if(LoginMsg==true) then
