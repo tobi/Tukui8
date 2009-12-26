@@ -54,10 +54,10 @@ coords = {
 gridposX = 18									-- horizontal unit #1 position value
 gridposY = -290									-- vertical unit #1 position value
 gridposZ = "TOPLEFT"							-- position grid X,Y values from
-gridonly = false								-- Replace 10, 15 mans default layout by grid layout 
+gridonly = false							-- Replace 10, 15 mans default layout by grid layout 
 showsymbols = true 								-- for grid mode only (healer layout only)
-gridaggro = false								-- show "aggro" text on grid unit if a player have aggro from a creature.
-raidunitdebuffwatch = false						-- show "dangerous unit debuff" in raid on different encounter. (note: PVE SUX LOL)
+gridaggro = true								-- show "aggro" text on grid unit if a player have aggro from a creature.
+raidunitdebuffwatch = true						-- show "dangerous unit debuff" in raid on different encounter. (note: PVE SUX LOL)
 gridhealthvertical = true						-- set health bar vertically on 25/40 mans layout 
 
 -- extra options

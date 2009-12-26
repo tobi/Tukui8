@@ -1,6 +1,6 @@
 ## Interface: 30300
 ## Author: Tukz
-## Version: 8.22
+## Version: 8.23
 ## Title: |cffC495DDTukui|r
 ## Notes: UI of awesomeness!
 ## SavedVariables: tCooldownTracker_Saved bb08df87101dd7f2161e5b77cf750f753c58ef1b

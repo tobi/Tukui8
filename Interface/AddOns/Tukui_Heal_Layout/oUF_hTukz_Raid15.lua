@@ -13,6 +13,41 @@ local backdrop = {
 	insets = {top = -2, left = -2, bottom = -2, right = -2},
 }
 
+------------------------------------------------------------------------
+--	Colors
+------------------------------------------------------------------------
+
+local colors = setmetatable({
+	power = setmetatable({
+		["MANA"] = {0.31, 0.45, 0.63},
+		["RAGE"] = {0.69, 0.31, 0.31},
+		["FOCUS"] = {0.71, 0.43, 0.27},
+		["ENERGY"] = {0.65, 0.63, 0.35},
+		["RUNES"] = {0.55, 0.57, 0.61},
+		["RUNIC_POWER"] = {0, 0.82, 1},
+		["AMMOSLOT"] = {0.8, 0.6, 0},
+		["FUEL"] = {0, 0.55, 0.5},
+		["POWER_TYPE_STEAM"] = {0.55, 0.57, 0.61},
+		["POWER_TYPE_PYRITE"] = {0.60, 0.09, 0.17},
+	}, {__index = oUF.colors.power}),
+	happiness = setmetatable({
+		[1] = {.69,.31,.31},
+		[2] = {.65,.63,.35},
+		[3] = {.33,.59,.33},
+	}, {__index = oUF.colors.happiness}),
+	runes = setmetatable({
+		[1] = {0.69, 0.31, 0.31},
+		[2] = {0.33, 0.59, 0.33},
+		[3] = {0.31, 0.45, 0.63},
+		[4] = {0.84, 0.75, 0.65},
+	}, {__index = oUF.colors.runes}),
+}, {__index = oUF.colors})
+
+oUF.colors.tapped = {0.55, 0.57, 0.61}
+oUF.colors.disconnected = {0.84, 0.75, 0.65}
+
+oUF.colors.smooth = {0.69, 0.31, 0.31, 0.65, 0.63, 0.35, 0.15, 0.15, 0.15}
+
 -- ------------------------------------------------------------------------
 -- local horror
 -- ------------------------------------------------------------------------
@@ -152,7 +187,9 @@ local function CreateStyle(self, unit)
 	self:SetBackdropColor(0.1, 0.1, 0.1)
 
 	self.Health = CreateFrame('StatusBar', nil, self)
-	self.Health:SetAllPoints(self)
+	self.Health:SetPoint("TOPLEFT")
+	self.Health:SetPoint("TOPRIGHT")
+	self.Health:SetHeight(27)
 	self.Health:SetStatusBarTexture(normTex)
 	self.Health.colorDisconnected = true
 	self.Health.colorClass = true
@@ -168,6 +205,27 @@ local function CreateStyle(self, unit)
 	self.Health.value:SetFont(fontlol, 12, "THINOUTLINE")
 	self.Health.value:SetTextColor(1,1,1)
 	self.Health.value:SetShadowOffset(1, -1)
+	
+	self.Power = CreateFrame("StatusBar", nil, self)
+	self.Power:SetHeight(4)
+	self.Power:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -1)
+	self.Power:SetPoint("TOPRIGHT", self.Health, "BOTTOMRIGHT", 0, -1)
+	self.Power:SetStatusBarTexture(normTex)
+
+	self.Power.colorTapping = true
+	self.Power.colorDisconnected = true
+	self.Power.colorPower = true
+	self.Power.colorClass = true
+	self.Power.colorReaction = true
+
+	self.Power.frequentUpdates = true
+	self.Power.Smooth = true
+
+	self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
+	self.Power.bg:SetAllPoints(self.Power)
+	self.Power.bg:SetTexture(normTex)
+	self.Power.bg:SetAlpha(1)
+	self.Power.bg.multiplier = 0.4
 
 	local name = self.Health:CreateFontString(nil, 'OVERLAY', 'GameFontHighlightLeft')
 	name:SetFont(fontlol, 12, "THINOUTLINE")

@@ -21,6 +21,12 @@
 -- Icecrown Citadel "most dangerous" spellID's addition is from Mynd from Last Resort Guild
 if raidunitdebuffwatch == true then
 	spellIDs = {
+			 --Druid spells
+			  48440, --Rejuvenation
+			  48443, --Regrowth
+			  48450, --Lifebloom
+			  53249, --Wild Growth
+			  2893,  --Abolish Poison
 			  
 			 --Naxxramas
 			  27808, --Frost Blast
